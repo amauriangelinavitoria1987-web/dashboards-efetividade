@@ -1,0 +1,8 @@
+github_config.py
+*.xlsx
+*.csv
+*.parquet
+*.meta
+__pycache__/
+*.pyc
+setup_github.bat

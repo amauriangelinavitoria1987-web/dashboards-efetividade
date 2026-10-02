@@ -90,7 +90,7 @@ tfoot td{font-weight:800;background:#0B3040;border-top:2px solid var(--teal);pos
   <div class="legend">
     <span><i class="dot" style="background:#2DC5B4"></i>Expedido até 09h (meta)</span>
     <span><i class="dot" style="background:#C47A77"></i>Expedido após 09h</span>
-    <span>Percentuais: verde = até 09h · vermelho = após 09h</span>
+    <span>% até 09h: verde = meta (≥90%) · vermelho = abaixo da meta · demais faixas (após 09h) em vermelho</span>
   </div>
   <div class="tw"><table id="tb"></table></div>
   <section class="card hist">
@@ -121,7 +121,7 @@ const rl=Object.entries(RG).map(([r,o])=>({r,p:o.t?o.h/o.t*100:0})).sort((a,b)=>
 const cardReg=rl.length?`<div class="card"><div class="kl">Melhor / pior regional · até 09h</div><div class="rg ok"><span>▲ ${rl[0].r}</span><b>${Math.round(rl[0].p)}%</b></div>${rl.length>1?`<div class="rg bad"><span>▼ ${rl[rl.length-1].r}</span><b>${Math.round(rl[rl.length-1].p)}%</b></div>`:''}</div>`:'';
 document.getElementById('kpis').innerHTML=
 `<div class="card"><div class="kl">Total expedido</div><div class="kv">${fmt(T.t)}</div><div class="ks">${rows.length} ${rows.length===1?'filial':'filiais'}</div></div>
-<div class="card"><div class="kl">Até 09h</div><div class="kv ok">${p}%</div><div class="ks">${fmt(T.h09)} pedidos</div></div>
+<div class="card"><div class="kl">Até 09h</div><div class="kv ${p>=META?'ok':'bad'}">${p}%</div><div class="ks">${fmt(T.h09)} pedidos</div></div>
 <div class="card"><div class="kl">Filiais na meta (≥${META}%)</div><div class="kv ok">${na}</div><div class="ks">de ${rows.length}</div></div>
 <div class="card"><div class="kl">Filiais abaixo da meta</div><div class="kv bad">${rows.length-na}</div><div class="ks">expedição tardia</div></div>
 <div class="card"><div class="kl">Após 09h</div><div class="kv bad">${fmt(T.t-T.h09)}</div><div class="ks">${100-p}% do total</div></div>
@@ -132,9 +132,9 @@ const cell=(v,c,cls)=>`<td class="${v?cls:'z'}${c?' '+c:''}">${fmt(v)}</td>`;
 let h=`<thead><tr><th class="l">Data</th><th class="l">Filial</th><th>Até 09h</th><th>Até 10h</th><th>Até 11h</th><th>Até 12h</th><th>Demais horas</th><th>Total geral</th><th class="sep">Até 09h <button id="srt" class="srt" title="Inverter a ordem: pior ↔ melhor">${SORT===1?'▲':'▼'}</button></th><th>Até 10h</th><th>Até 11h</th><th>Até 12h</th><th>Demais horas</th></tr></thead><tbody>`;
 rows.forEach(r=>{const g=Math.round(r.p09)>=META;
 h+=`<tr><td class="l">${DATA.dataCurta}</td><td class="l">${r.nome}</td>${cell(r.h09,'','c9')}${cell(r.h10,'','cl')}${cell(r.h11,'','cl')}${cell(r.h12,'','cl')}${cell(r.dem,'','cl')}<td><b>${fmt(r.t)}</b></td>`+
-`<td class="sep"><span class="pg g" style="display:block;padding:2px 8px">${Math.round(r.p09)}%</span></td>`+
+`<td class="sep"><span class="pg ${Math.round(r.p09)>=META?'g':'r'}" style="display:block;padding:2px 8px">${Math.round(r.p09)}%</span></td>`+
 cols.slice(1).map(k=>`<td class="p">${pr(r[k],r.t)}</td>`).join('')+'</tr>';});
-h+=`</tbody><tfoot><tr><td class="l" colspan="2">Total geral</td><td>${fmt(T.h09)}</td><td>${fmt(T.h10)}</td><td>${fmt(T.h11)}</td><td>${fmt(T.h12)}</td><td>${fmt(T.dem)}</td><td>${fmt(T.t)}</td><td class="sep"><span class="pg g" style="display:block;padding:2px 8px">${p}%</span></td>`+
+h+=`</tbody><tfoot><tr><td class="l" colspan="2">Total geral</td><td>${fmt(T.h09)}</td><td>${fmt(T.h10)}</td><td>${fmt(T.h11)}</td><td>${fmt(T.h12)}</td><td>${fmt(T.dem)}</td><td>${fmt(T.t)}</td><td class="sep"><span class="pg ${p>=META?'g':'r'}" style="display:block;padding:2px 8px">${p}%</span></td>`+
 cols.slice(1).map(k=>`<td>${pr(T[k],T.t)}</td>`).join('')+'</tr></tfoot>';
 document.getElementById('tb').innerHTML=h;
 document.getElementById('ord').textContent='Ordenado do '+(SORT===1?'menor para o maior':'maior para o menor')+' % até 09h';

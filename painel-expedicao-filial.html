@@ -168,12 +168,12 @@ function desenha(){
   const pts=s.map((o,i)=>[X(i),Y(o.p)]);
   const fp=pts.filter((_,i)=>!s[i].parcial&&!s[i].dom);
   if(fp.length>1) g+=`<polyline fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2.5" stroke-linejoin="round" points="${fp.map(q=>q.join(',')).join(' ')}"/>`;
-  const passo=Math.ceil(s.length/12), rot=s.length<=20;
+  const passo=s.length<=24?1:Math.ceil(s.length/24), fx=s.length>16?12:14, rot=s.length<=20;
   s.forEach((o,i)=>{const [x,y]=pts[i];
     g+=(o.parcial||o.dom)?`<circle cx="${x}" cy="${y}" r="6" fill="none" stroke="${cor(o.p)}" stroke-width="2.5" stroke-dasharray="3 2"><title>${dm(o.d)} (${o.parcial?'parcial':(o.fer?'feriado':'domingo')+', fora da média'}): ${o.p.toFixed(1)}%</title></circle>`
                 :`<circle cx="${x}" cy="${y}" r="6" fill="${cor(o.p)}"><title>${dm(o.d)}: ${o.p.toFixed(1)}% (${o.h.toLocaleString('pt-BR')} de ${o.t.toLocaleString('pt-BR')})</title></circle>`;
     if(rot) g+=`<text x="${x}" y="${y-11}" text-anchor="middle" font-size="14" font-weight="700" style="fill:${corT(o.p)}">${Math.round(o.p)}%${(o.parcial||o.dom)?'*':''}</text>`;
-    if(i%passo===0||i===s.length-1) g+=`<text x="${x}" y="${H-10}" text-anchor="middle" font-size="14">${dm(o.d)}</text>`;});
+    if(i%passo===0||i===s.length-1) g+=`<text x="${x}" y="${H-10}" text-anchor="middle" font-size="${fx}">${dm(o.d)}</text>`;});
   document.getElementById('chart').innerHTML=s.length?`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução diária do percentual expedido até 09h">${g}</svg>`+(s.some(o=>o.parcial||o.dom)?'<div style="font-size:13px;opacity:.7">* '+[s.some(o=>o.parcial)?'dia em andamento (parcial)':'',s.some(o=>o.dom&&!o.fer)?'domingo':'',s.some(o=>o.fer)?'feriado':''].filter(Boolean).join(' e ')+' não entra na média</div>':''):'<div style="opacity:.7;padding:20px">Sem histórico ainda.</div>';
 }
 selF.addEventListener('change',()=>{FIL=selF.value;render();desenha();}); desenha();
